@@ -1,0 +1,90 @@
+<table id="cartTable">
+  <tbody>
+    <tr>
+      <td class="price">100</td>
+      <td>
+        <button class="minus">-</button>
+        <input type="text" class="qty" value="1">
+        <button class="plus">+</button>
+      </td>
+      <td class="subtotal">100</td>
+    </tr>
+  </tbody>
+
+  <tfoot>
+    <tr>
+      <td colspan="2">Grand Total</td>
+      <td id="grandTotal">0</td>
+    </tr>
+    <tr>
+      <td colspan="2">GST (18%)</td>
+      <td id="gst">0</td>
+    </tr>
+    <tr>
+      <td colspan="2"><b>Total with GST</b></td>
+      <td id="finalTotal"><b>0</b></td>
+    </tr>
+  </tfoot>
+</table>
+
+
+
+
+
+$(document).ready(function () {
+
+    function calculateCart() {
+        let grandTotal = 0;
+
+        $("#cartTable tbody tr").each(function () {
+            let price = parseFloat($(this).find(".price").text()) || 0;
+            let qty = parseInt($(this).find(".qty").val()) || 0;
+
+            let subtotal = price * qty;
+
+            $(this).find(".subtotal").text(subtotal.toFixed(2));
+
+            grandTotal += subtotal;
+        });
+
+        let gst = grandTotal * 0.18; // 18% GST
+        let finalTotal = grandTotal + gst;
+
+        $("#grandTotal").text(grandTotal.toFixed(2));
+        $("#gst").text(gst.toFixed(2));
+        $("#finalTotal").text(finalTotal.toFixed(2));
+    }
+
+    // PLUS BUTTON
+    $(document).on("click", ".plus", function () {
+        let qtyInput = $(this).siblings(".qty");
+        qtyInput.val(parseInt(qtyInput.val() || 0) + 1);
+        calculateCart();
+    });
+
+    // MINUS BUTTON
+    $(document).on("click", ".minus", function () {
+        let qtyInput = $(this).siblings(".qty");
+        let qty = parseInt(qtyInput.val() || 0);
+
+        if (qty > 1) {
+            qtyInput.val(qty - 1);
+        } else {
+            qtyInput.val(1);
+        }
+
+        calculateCart();
+    });
+
+    // DIRECT INPUT CHANGE
+    $(document).on("keyup change", ".qty", function () {
+        let val = parseInt($(this).val());
+        if (isNaN(val) || val < 1) {
+            $(this).val(1);
+        }
+        calculateCart();
+    });
+
+    // initial load
+    calculateCart();
+});
